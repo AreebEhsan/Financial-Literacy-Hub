@@ -47,7 +47,7 @@ def load_or_build_index(_embeddings: OpenAIEmbeddings):
             allow_dangerous_deserialization=True
         )
 
-    st.info("Index not found – building from PDFs (this may take a while)...")
+
     raw_text = load_all_pdfs(PDF_FOLDER)
     splitter = CharacterTextSplitter(
         separator="\n",
@@ -58,7 +58,7 @@ def load_or_build_index(_embeddings: OpenAIEmbeddings):
     chunks = splitter.split_text(raw_text)
     vector = FAISS.from_texts(chunks, _embeddings)
     vector.save_local(INDEX_PATH)
-    st.success("Index built and cached for future runs.")
+
     return vector
 
 
@@ -86,13 +86,7 @@ def main():
     vector_store = load_or_build_index(embeddings)
     chain = build_chain()
 
-    # Optional: button to rebuild index
-    if st.button("🔄 Rebuild Knowledge Base"):
-        if os.path.exists(INDEX_PATH):
-            import shutil
-            shutil.rmtree(INDEX_PATH)
-            st.cache_resource.clear()  # clear cached index
-            st.experimental_rerun()
+
 
     # User question
     question = st.chat_input("Ask a beginner finance question (budgeting, saving, credit, etc.)")
